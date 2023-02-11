@@ -2,9 +2,7 @@
     <div class="card-header card-info">Состояние данных импорта (данные по файлу)</div>
     <div class="card-body">
         <?php
-
         if (!isset($params)) die();
-        $name_type = \backend\modules\import\AdminImportTmp::listType();
         foreach ($params as $key => $param)
         {
             $n = (is_countable($param)) ? count($param) : 0;

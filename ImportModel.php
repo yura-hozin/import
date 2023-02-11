@@ -3,7 +3,7 @@
 namespace backend\modules\import;
 
 use Yii;
-use backend\modules\import\ImportStrategy;
+use backend\modules\import\i\ImportStrategy;
 
 
 /**
@@ -56,9 +56,9 @@ class ImportModel
         } else {
             return [
                 'classes' => array(
-                    'ImportCategoryModel' => array(
+                    'ImportDefaultModel' => array(
                         'title' => 'Импорт категорий',
-                        'path' => '\backend\modules\import\ImportCategoryModel',
+                        'path' => '\backend\modules\import\models\ImportDefaultModel',
                         'source' => 1
                     )
                 )

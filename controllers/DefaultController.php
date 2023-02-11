@@ -33,7 +33,6 @@ class DefaultController extends Controller
             foreach ($err as $error)
                 Yii::$app->session->setFlash('error', $error);
         }
-
         else{
             // Кол-во записей во всех таблицах БД, связанных с импортом
             $count_to_tables = $model->getCountDataTableImport();
@@ -41,10 +40,8 @@ class DefaultController extends Controller
             // Загружаем данные импорта в _data
             $model->loadDataImport();
 
-    //        echo "<pre>"; print_r($info); echo "</pre>";
-            die("222");
-
-            $info['block_all_data'] = $this->renderPartial('block_all_data', ['params'=> $model->getData()]);
+            $name_type = \backend\modules\import\AdminImportTmp::listType();
+            $info['block_all_data'] = $this->renderPartial('block_all_data', ['params'=> $model->getData(), 'name_type' => $name_type]);
 
             $info['block_check_all_data'] = $this->renderPartial('block_check_all_data',
                 [

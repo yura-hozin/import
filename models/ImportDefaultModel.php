@@ -16,7 +16,7 @@ use backend\modules\import\i\ImportStrategy;
  * Class ImportDefaultModel
  * @package backend\modules\import\models
  */
-class ImportDefaultModel extends ImportStrategy{
+class ImportDefaultModel implements ImportStrategy{
 
     public function init(){
 

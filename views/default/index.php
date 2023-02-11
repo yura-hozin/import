@@ -13,6 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-md-6">
             <?= Html::a('Главная страница импорта', ['/import'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Настройки', ['/import/settings'], ['class' => 'btn btn-warning']) ?>
         </div>
 
         <div class="col-md-6">
@@ -110,7 +111,7 @@ $this->registerJs('
                 $("#contentimports").html(data);
             },
             error: function () {
-                alert("no");
+                alert("Ошибка загрузки блоков импорта!");
             }
         });
     }
@@ -130,7 +131,7 @@ $this->registerJs('
     }
 
     $(".btn-upload").click(function () {
-        $("#contentimports").html("data3");
+        $("#contentimports").html("Нет блоков для отображения");
         loadBlockImport();    
     });
     $(".btn-upload").click();
