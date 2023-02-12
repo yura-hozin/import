@@ -2,6 +2,7 @@
 
 namespace backend\modules\import;
 
+use backend\modules\import\models\AdminImportModel;
 use Yii;
 use backend\modules\import\i\ImportStrategy;
 
@@ -13,6 +14,7 @@ use backend\modules\import\i\ImportStrategy;
  */
 class ImportModel
 {
+    // От этих констант нужно избавиться
     const STATUS_NEW = 0;
     const STATUS_IN_PROGRESS = 1;
     const STATUS_PROCESSED = 2;
@@ -25,7 +27,7 @@ class ImportModel
     protected $_info = array();
     /** @var array Ошибки */
     protected $_error = array();
-    /** @var Модель */
+    /** @var Модель. Сюда подключается объект конкретного импорта */
     private $_model;
     /** @var array Классы всех модулей импортов (загрузка из конфига) */
     private $_class = array();
@@ -33,15 +35,15 @@ class ImportModel
     public $_import_id = 0;
     /** @var int Статус текущего импорта */
     public $_import_status = 0;
+    /** @var array Параметры импорта */
+    private $_config = array();
 
     /**
      * Загружаем в конструкторе данные из конфига
      * ImportModel constructor.
      */
     function __construct() {
-        $conf = $this->getConfig('import');
-        if (!empty($conf) && isset($conf['classes']))
-            $this->_class = $conf['classes'];
+        $this->_config = $this->getConfig('params');
     }
 
     /**
@@ -50,20 +52,11 @@ class ImportModel
      */
     protected function getConfig($name)
     {
-        $path = \Yii::getAlias('@backend/config/'.$name.'.php');
+        $path = __DIR__.'/config/'.$name.'.php';
         if (file_exists($path)) {
             return require($path);
-        } else {
-            return [
-                'classes' => array(
-                    'ImportDefaultModel' => array(
-                        'title' => 'Импорт категорий',
-                        'path' => '\backend\modules\import\models\ImportDefaultModel',
-                        'source' => 1
-                    )
-                )
-            ];
-        }
+        } else
+            return [];
     }
 
     /**
@@ -90,7 +83,15 @@ class ImportModel
     /** Проверка модулей импорта */
     public function init()
     {
-        $str = "";
+        // Проверка конфига
+        if (empty($this->_config))
+            $this->_error[] = "Параметры импорта в конфиге не указаны (пусто)";
+
+        if (!count($this->_error))
+        {
+            // Загружаем классы из таблицы
+        }
+        /*
         $str .= "<div>Количество: ".count($this->_class)."</div>";
         foreach ($this->_class as $class => $data)
         {
@@ -105,7 +106,73 @@ class ImportModel
                 $str .= "<div>- Класс: <u>".$class."</u> <b>Не существует!</b> (Или путь к нему не верный)</div>";
             }
         }
-        return $str;
+        */
+        return;
+    }
+
+    /**
+     * Запускаем загрузку новых модулей импорта
+     */
+    public function runLoadClassesImport()
+    {
+        // Загрузка классов импортов
+        if (isset($this->_config['path_to_classes'])
+            && !empty($this->_config['path_to_classes'])
+            && (file_exists(Yii::getAlias($this->_config['path_to_classes'])))){
+            return $this->loadClassesImport(Yii::getAlias($this->_config['path_to_classes']));
+        }
+        else
+            $this->_error[] = "Путь на классы импортов не корректный";
+        return array();
+    }
+
+    /**
+     * Находим и регистрируем все классы импортов по указанному пути
+     * @param $path
+     */
+    protected function loadClassesImport($path)
+    {
+        $res = [];
+        $files = $this->getFilesToDir($path);
+        foreach ($files as $file)
+        {
+            $file = mb_substr($file, 0, -4);
+
+            $filename = $this->_config['path_to_classes']."/".$file;
+            $filename = str_replace("@", "/", $filename);
+            $filename = str_replace("/", "\\", $filename);
+
+            $row = AdminImportModel::find()->where(['path' => $filename])->one();
+            if (class_exists($filename, true) && !$row) {
+                $mod = new $filename();
+
+                $model = new AdminImportModel();
+                $model->title = $mod->init();
+                $model->path = $filename;
+                $model->save();
+                $res[] = [
+                    'path' => $filename,
+                    'comment' => "Добавлена новая модель импорта"
+                ];
+            }
+            else{
+                $res[] = [
+                    'path' => $filename,
+                    'comment' => "Импорт уже добавлен или не корректный"
+                ];
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Возвращает список файлов из указанной категории
+     * @param $path
+     * @return array
+     */
+    private function getFilesToDir($path)
+    {
+        return array_diff(scandir($path), array('..', '.'));
     }
 
     /**
@@ -141,7 +208,7 @@ class ImportModel
      */
     private function getPathToFileImport()
     {
-        if (isset(Yii::$app->params['dir_import']))
+        if (isset($this->_config['dir_import']) && !empty($this->_config['dir_import']))
         {
             $row = AdminImportList::find()->orderBy('id DESC')->one();
 
@@ -149,12 +216,12 @@ class ImportModel
             {
                 $this->_import_id = $row->id;
                 $this->_import_status = $row->status;
-                $file = \Yii::getAlias(Yii::$app->params['dir_import']."/".$row->id."_import.json");
+                $file = \Yii::getAlias($this->_config['dir_import']."/".$row->id."_import.json");
                 return $file;
             }
         }
         else
-            $this->_error[] = "Файл конфигурации не найден или пуст!";
+            $this->_error[] = "Путь к файлу импорта не указан";
 
         return null;
     }

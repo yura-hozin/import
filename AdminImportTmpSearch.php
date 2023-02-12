@@ -48,7 +48,7 @@ class AdminImportTmpSearch extends AdminImportTmp
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => OptionsWidget::widget(['ident' => 'management_pagination_adminka'])
+                'pageSize' => 20
             ]
         ]);
 

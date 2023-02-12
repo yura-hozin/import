@@ -1,3 +1,4 @@
+
 <?php
 
 use \backend\widgets\Options\OptionsWidget;
@@ -12,7 +13,7 @@ use yii\widgets\Pjax;
 Pjax::begin([
     'id' => 'actionChangeOptionAjax'
 ]);
-$this->title = 'Список импортов с web-сервиса';
+$this->title = 'Задачи на импорт';
 $this->params['breadcrumbs'][] = $this->title;
 $statuses = \backend\modules\import\AdminImportList::getStatuses();
 $GLOBALS['statuses'] = $statuses;
@@ -40,6 +41,9 @@ function getTitleStatus($key)
 }
 
 ?>
+
+<?= Html::a('Главная страница импорта', ['/import'], ['class' => 'btn btn-primary']) ?>
+
 <div class="admin-import-list-index">
 
     <h1><?= Html::encode($this->title) ?></h1>

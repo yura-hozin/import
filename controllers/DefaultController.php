@@ -19,19 +19,21 @@ class DefaultController extends Controller
     {
         $model = new ImportModel();
 
-        /* --- Информация по файлу импорта и загрузка данных из него --- */
-        $info = $model->getInfoFileImport();
-
         // *----- Проверка модулей импорта --- *
         $str_info_modules_import = $model->init();
         $info['init_modules_import'] = $str_info_modules_import;
+
+        /* --- Информация по файлу импорта и загрузка данных из него --- */
+        $info = $model->getInfoFileImport();
 
         // Проверка на ошибки
         if (count($model->getErrors()) > 0)
         {
             $err = $model->getErrors();
-            foreach ($err as $error)
-                Yii::$app->session->setFlash('error', $error);
+
+            Yii::$app->session->setFlash('error', $err[0]);
+            //foreach ($err as $error)
+            //    Yii::$app->session->setFlash('error', $error);
         }
         else{
             // Кол-во записей во всех таблицах БД, связанных с импортом

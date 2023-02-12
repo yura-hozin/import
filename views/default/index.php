@@ -6,14 +6,19 @@ use yii\helpers\ArrayHelper;
 $this->title = 'Импорт данных v3.0';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<?= Html::a('Главная страница импорта', ['/import'], ['class' => 'btn btn-primary']) ?>
+<?= Html::a('Задачи на импорт', ['/import/admin-import-list'], ['class' => 'btn btn-primary']) ?>
+<?= Html::a('Временная таблица', ['/import/admin-import-tmp'], ['class' => 'btn btn-primary']) ?>
+<?= Html::a('Все импорты', ['/import/admin-import-model'], ['class' => 'btn btn-primary']) ?>
+
+<?= Html::a('Настройки', ['/import/settings'], ['class' => 'btn btn-warning']) ?>
 
 <div class="modules-default-index">
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="row">
         <div class="col-md-6">
-            <?= Html::a('Главная страница импорта', ['/import'], ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('Настройки', ['/import/settings'], ['class' => 'btn btn-warning']) ?>
+
         </div>
 
         <div class="col-md-6">
